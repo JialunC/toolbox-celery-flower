@@ -25,3 +25,15 @@ services:
     command: celery beat -A worker --loglevel=INFO
     env_file:
       - ./services/celery/dev.env
+  
+  flower:
+    image: mher/flower:0.9.7
+    command: flower --broker=redis://redis:6379 --port=5555
+    ports:
+      - "5555:5555"
+    env_file:
+      - ./services/flower/dev.env
+    depends_on:
+      - redis
+      - worker
+      - beat
