@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  redis:
+    image: redis:6.0
+    ports:
+      - "6379:6379"
+  
+  worker:
+    build:
+      context: ./services/celery
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    command: celery worker -A worker -Q queue1 --loglevel=INFO
+    env_file:
+      - ./services/celery/dev.env
+  
+  beat:
+    build:
+      context: ./services/celery
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    command: celery beat -A worker --loglevel=INFO
+    env_file:
+      - ./services/celery/dev.env
